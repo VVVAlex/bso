@@ -903,7 +903,7 @@ class App(ttk.Frame):
             self.depth = depth
             if depth != self.old_depth or not self.infobar.diap_var.get():
                 self.infobar.diap_var.set(f"{depth}")
-                self.old_depth = depth
+                self.old_depth = depth 
             self.porog_var.set(f"{ku}")
             self.stop_var.set(f" {m}  из  {cnt} ")
             glub = int.from_bytes(data[4:6], 'big')
