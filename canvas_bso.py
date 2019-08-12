@@ -36,9 +36,9 @@ class CanvasT(ttk.Frame):
             ttk.Label(colorbar, background=i, width=1).pack(fill=tk.Y, expand=True)
         colorbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
         
-        self.scl_amp = tk.Canvas(self.sclrbar, width=w, bg="black",
-                                 height=300, bd=0, highlightthickness=0, relief=tk.RIDGE)
-        self.scl_amp.pack(side=tk.RIGHT, fill=tk.Y, expand=False, padx=0)
+        # self.scl_amp = tk.Canvas(self.sclrbar, width=w, bg="black",
+        #                          height=300, bd=0, highlightthickness=0, relief=tk.RIDGE)
+        # self.scl_amp.pack(side=tk.RIGHT, fill=tk.Y, expand=False, padx=0)
         
         canv = tk.Canvas(self, background='#383838', relief=tk.SUNKEN)
         canv.config(width=self.sizeX, height=self.sizeY)
