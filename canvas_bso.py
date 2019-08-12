@@ -31,7 +31,7 @@ class CanvasT(ttk.Frame):
         # self.create_fild()
 
         colorbar = ttk.Frame(self, relief=tk.GROOVE, border=1)
-        self.sclrbar = ttk.Frame(self, border=0)
+        # self.sclrbar = ttk.Frame(self, border=0)
         for i in COLOR:
             ttk.Label(colorbar, background=i, width=1).pack(fill=tk.Y, expand=True)
         colorbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
@@ -44,9 +44,9 @@ class CanvasT(ttk.Frame):
         canv.config(width=self.sizeX, height=self.sizeY)
         canv.config(highlightthickness=0)
         sbar = ttk.Scrollbar(self)
-        sbar.config(command=self.myyview)     # canv.yview
+        sbar.config(command=self.myyview)                  # canv.yview
         canv.config(yscrollcommand=sbar.set)
-#        sbar.pack(side='left', fill='y')       # пакуем в bso
+#        sbar.pack(side='left', fill='y')                  # пакуем в bso
         self.sbar = sbar
 #        canv.pack(side='left', fill='both', expand='yes') # пакуем в bso
         self.canv = canv

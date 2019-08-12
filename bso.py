@@ -138,9 +138,9 @@ class App(ttk.Frame):
         self.head.set_format(('DBT', 'DBK', 'DBS')[config.getint('Preferens', 'd')])
         self.numstr_var.set('')
 
-        scl = config.getboolean('Scale', 'amplscl')
-        if scl:
-            self.board.sclrbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)  # показать шкалу
+        # scl = config.getboolean('Scale', 'amplscl')
+        # if scl:
+        #     self.board.sclrbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)  # показать шкалу
         yscroll = config.getboolean('Scale', 'yscroll')
         if yscroll:
             self.board.sbar.pack(side=tk.LEFT, fill=tk.Y)                    # показать полосу прокрутки
