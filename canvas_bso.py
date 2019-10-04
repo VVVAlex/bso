@@ -196,6 +196,8 @@ class CanvasT(ttk.Frame):
     @staticmethod    
     def rgbc(arg):
         """Вернуть цвет по амплитуде как в ПУИ"""
+        if arg > 255:
+            arg = 255
         a = (0x14, 0x2C, 0x3E, 0x4E, 0x60, 0x72, 0x80, 0x90, 0xA0, 0xB6, 0xD0, 0xFF)   # темносиний ... темнокрасный
         for i, j in enumerate(a):
             if arg <= j:

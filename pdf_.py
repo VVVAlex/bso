@@ -2,10 +2,11 @@
 # -*- coding:utf-8 -*-
 
 import os.path, time, locale
+import pathlib
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape  #letter
 from reportlab.pdfbase import pdfmetrics, ttfonts
-from util import imgdir, rgb
+from util import imgdir, rgb, bakdir
 
 #  система координат x0, y0 левый нижний угол x1, y1 правый верхний угол
 
@@ -29,9 +30,13 @@ class Pdf:
         myFontObject = ttfonts.TTFont('Arial', 'arial.ttf')
         pdfmetrics.registerFont(myFontObject)
         self.dir = '.'
+        cur_path = pathlib.Path('temp.pdf')
+        self.tmp_name = cur_path.joinpath(bakdir, cur_path)
         if self.data:
-            self.c = canvas.Canvas("temp.pdf", pagesize=landscape(A4))  # файл "temp.pdf"
-                                                                        # в текущем каталоге
+            # name = os.path.join(bakdir, 'temp.pdf')
+            # self.c = canvas.Canvas("temp.pdf", pagesize=landscape(A4))  # файл "temp.pdf"
+                                                                          # в текущем каталоге
+            self.c = canvas.Canvas(f"{self.tmp_name}", pagesize=landscape(A4))
             self.asix()
             self.grid()
             self.c.setFillColor('darkblue')
@@ -217,10 +222,12 @@ class Pdf:
     #         else subprocess.Popen(f'{file} /p {name}')
     # subprocess.run(['explorer', 'csyntax.pdf'])
 
-    @staticmethod
-    def go(verbose):
+    def go(self, verbose):
         command = 'open' if verbose else 'print'
         try:
-            os.startfile('temp.pdf', command)
+            # os.startfile('temp.pdf', command)
+            # cur_path = pathlib.Path('temp.pdf')
+            # name = cur_path.joinpath(bakdir, cur_path)
+            os.startfile(f'{self.tmp_name}', command)
         except:
             pass

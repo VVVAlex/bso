@@ -4,6 +4,7 @@
 import tkinter as tk
 import os.path
 import pathlib
+import tempfile
 import sys
 import configparser
 import png
@@ -28,6 +29,7 @@ if not file.exists():
     
 config.read(file, encoding='utf-8')
 
+bakdir = tempfile.mkdtemp()
 
 def write_config():
     """Сохранение файла сонфигурации"""

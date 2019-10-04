@@ -7,6 +7,7 @@ import tkinter.messagebox as box
 from tkinter.filedialog import askopenfilename  # asksaveasfilename
 import os, time
 import pathlib
+import shutil
 import csv
 import hashlib
 import io
@@ -14,7 +15,7 @@ from collections import namedtuple
 from tooltip import ToolTip
 import canvas_show, pdf_
 from util import imgdir, create_img, set_application_icons
-from util import config
+from util import config, bakdir
 from db_api import request_data_coment, request_data_all
 from db_show import ViewMetka
 
@@ -26,14 +27,14 @@ except:
 
 class App(ttk.Frame):
     """Основной класс"""
-    def __init__(self, parent, title, filename=None, galsname=None):
+    def __init__(self, parent, title, galsname=None):
         super().__init__(parent)
 
         self.can_show = canvas_show.Fild(self)          # bso_=True
         self.can_show.pack()
         self.state_ = True
         self.parent = parent
-        self.filename = filename
+        self.filename = None
         self.galsname = galsname
         self.img_ = create_img()
         self.parent.withdraw()
@@ -55,7 +56,18 @@ class App(ttk.Frame):
          self.m_dno, self.m_avto, self.m_hide) = (tk.IntVar(self.parent, 1), tk.IntVar(self.parent, 1),
                                                   tk.IntVar(self.parent, 1), tk.IntVar(self.parent, 0),
                                                   tk.IntVar(self.parent, 1), tk.IntVar(self.parent, 1))
+        self.get_tmp_file()
 
+    def get_tmp_file(self):
+        """Получить временный файл"""
+        cur_path = pathlib.Path('tmp_file')                           # имя файл
+        if self.galsname:
+            self.filename = cur_path.joinpath(bakdir, cur_path)       # файл обьединить с врем дир
+            try:
+                shutil.copyfile(self.galsname, bakdir)
+            except IOError:
+               self.filename = None  
+        
     def run(self):
         """Начало"""
         self.tol_bar = Toolbar(self)     # панель инструментов
@@ -64,7 +76,7 @@ class App(ttk.Frame):
         self.header()                    # нижний информ. лабель pack('bottom')
         self.content()                   # нотебук
         self.bind__()
-        if self.filename:                           # сразу открыть файл
+        if self.filename:                # сразу открыть файл
             self.view_mem()
             self.get_db_tb_name(self.galsname)
         self.parent.deiconify()
@@ -73,26 +85,30 @@ class App(ttk.Frame):
     def get_geometry_root(self):
         return (self.parent.geometry(), self.parent.winfo_rootx(),  self.parent.winfo_rooty())
 
-    def remove_pdf(self):
-        """Удаление временного pdf файла"""
-        try:
-            self.can_show.unbind_()
-        except Exception:
-            pass
-        try:
-            os.remove('temp.pdf')
-        except Exception:
-            pass
-        try:
-            os.unlink('db_op.pdf')
-        except Exception:
-            pass
+    # def remove_pdf(self):
+    #     """Удаление временного pdf файла"""
+    #     try:
+    #         self.can_show.unbind_()
+    #     except Exception:
+    #         pass
+    #     try:
+    #         os.remove('temp.pdf')
+    #     except Exception:
+    #         pass
+    #     try:
+    #         os.unlink('db_op.pdf')
+    #     except Exception:
+    #         pass
 
     def file_quit(self, event=None):
         """Выход"""
         # if self.okay_to_exit():
-        self.remove_pdf()
+        # self.remove_pdf()
         # self.remove_gals_dubl(self.dir)
+        try:
+            self.can_show.unbind_()
+        except Exception:
+            pass
         self.parent.destroy()
 
 #----------------- view memory PUI ----------------------------------------
@@ -226,6 +242,7 @@ class App(ttk.Frame):
     def view_mem(self, arg=None):
         """Просмотр данных arg=None если запуск из просмотра лога"""
         # direct = True
+        # self.parent.focus_force()
         self.rev_flag = True
         if arg:
             self.filename = self.open_file(self.dir)
@@ -233,6 +250,8 @@ class App(ttk.Frame):
             self.rev_flag = False
         if not self.filename:
             return
+        self.parent.focus_force()
+        # self.notebook.lift()
         self.notebook.config(cursor='watch')
         f_csv, out = self.read_csv()
         # start = time.time()
@@ -241,7 +260,8 @@ class App(ttk.Frame):
         if self.rev_flag:
             if out:
                 out.close()
-            os.unlink(self.filename)                 # удаляем из tmp
+            # os.unlink(self.filename)                 # удаляем из tmp
+            # shutil.rmtree(bakdir)                    # удаляем tmp каталог
             self.filename = ''
         # end = time.time()
         # print(end - start)

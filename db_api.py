@@ -20,6 +20,8 @@ class LookupDict(dict):
 req = LookupDict({'num': 0, 'timedata': '', 'shirota': '', 'dolgota': '' ,'glubina': 0, 'coment': ''})
         
 def execute_db_query(dbname, query, parameters=()):
+    dbname = str(dbname)
+    dbname = str(dbname)
     with sqlite3.connect(dbname) as conn:
         cursor = conn.cursor()
         query_result = cursor.execute(query, parameters)

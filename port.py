@@ -91,11 +91,11 @@ class RS232:
             return
         return data[1:89]
         
-    def read_all(self):
+    def read_allb(self):
         """Чтение данных из линии 12bytes + !or? +# + 91bytes = 105"""
         if not self.tty.in_waiting:     # new!
             return
-        data = self.tty.readall()
+        data = self.tty.readall()       # многократный read() timeout продлевается
         #data = self.tty.read(105)
         #self.tty.reset_input_buffer()
         self.trace('>> ', len(data))

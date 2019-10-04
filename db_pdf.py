@@ -32,8 +32,8 @@ def _go_data(result):
         data.append(res)
     return data
 
-def go_pdf(result):
-    doc = SimpleDocTemplate("db_op.pdf", pagesize=A4, rightMargin=15,
+def go_pdf(result, tmp_name):
+    doc = SimpleDocTemplate(f'{tmp_name}', pagesize=A4, rightMargin=15,
                             leftMargin=20, topMargin=15, bottomMargin=18)
     # doc.pagesize = landscape(A4)
     doc.pagesize = portrait(A4)

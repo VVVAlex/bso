@@ -9,19 +9,20 @@ import tkinter as tk
 import tkinter.messagebox as box
 from tkinter import ttk
 from tkinter.filedialog import askdirectory
-import os, time, shutil
+import os, time
 import pathlib
 import threading
 import queue
 import show_bso
 import csv
-import tempfile
+# import tempfile     #
+import shutil
 import hashlib
 import array
 from tooltip import ToolTip
 import dialog_ as dlg_
 from util import imgdir, set_application_icons, create_img, cwddir
-from util import config, write_config
+from util import config, write_config, bakdir
 from port import RS232, Gps, port_exc
 from toolbar import Toolbar
 from status_bar import Footer
@@ -194,17 +195,18 @@ class App(ttk.Frame):
             
     def runview_mem(self, arg=None):
         """Запуск просмотра Viewer"""
-        bakfile = None
-        if self.file_gals:
-            fd, bakfile = tempfile.mkstemp()
-            try:
-                shutil.copyfile(self.file_gals, bakfile)
-                os.close(fd)
-            except IOError:
-                bakfile = None
+        # bakfile = None
+        # if self.file_gals:
+        #     fd, bakfile = tempfile.mkstemp()    # bakdir = tempfile.mkdtemp()  shutil.rmtree(bakdir)
+        #     try:                                # see path_test.py
+        #         shutil.copyfile(self.file_gals, bakfile)
+        #         os.close(fd)
+        #     except IOError:
+        #         bakfile = None
         top = tk.Toplevel()
         title = 'БСО просмотр логов' if bso_ else 'ПУИ просмотр логов'
-        app_view = show_bso.App(top, title=title, filename=bakfile, galsname=self.file_gals)
+        # app_view = show_bso.App(top, title=title, filename=bakfile, galsname=self.file_gals)
+        app_view = show_bso.App(top, title=title, galsname=self.file_gals)
         app_view.run()
         top.protocol("WM_DELETE_WINDOW", app_view.file_quit)
         top.iconbitmap(self.path.joinpath(imgdir, 'bookmark.ico'))
@@ -784,16 +786,16 @@ class App(ttk.Frame):
     def getmsg(self, que):
         """Поточная функция чтения ППУ"""
         while self.tol_bar.flag_gals:
-            msg = self.ser.read_all()       # byte or None
+            msg = self.ser.read_allb()         # byte or None
             if msg:
-                que.put(msg)                # ждём пока очередь будет пуста
+                que.put(msg)                   # ждём пока очередь будет пуста
 
     def getmsg_g(self, que_gp):
         """Поточная функция чтения НСП"""
         while self.tol_bar.flag_gals:
-            msg = self.gser.get_msg()       # str or None
+            msg = self.gser.get_msg()          # str or None
             if msg:
-                que_gp.put(msg)               # ждём пока очередь будет пуста
+                que_gp.put(msg)                # ждём пока очередь будет пуста
       
     def run_loop(self):
         """
@@ -1003,6 +1005,7 @@ class App(ttk.Frame):
             self.root.withdraw()
             self.tol_bar.t = 0
             self.tol_bar.flag_gals = False
+            shutil.rmtree(bakdir)               # удаляем tmp каталог
             self.after(500, self.quitter)
 
     def okay_to_exit(self):

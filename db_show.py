@@ -4,8 +4,9 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import os.path
+import pathlib
 from tkinter.scrolledtext import ScrolledText
-from util import imgdir
+from util import imgdir, bakdir
 from db_pdf import go_pdf
 
 
@@ -54,9 +55,12 @@ class Editor:
         """Просмотр или печать базы отметок""" 
         data = self.parent.result
         command = 'open' if verbose else 'print'
-        go_pdf(data)
+        cur_path = pathlib.Path('db_op.pdf')
+        tmp_name = cur_path.joinpath(bakdir, cur_path)
+        go_pdf(data, tmp_name)
         try:
-            os.startfile('db_op.pdf', command)
+            os.startfile(f'{tmp_name}', command)
+            # os.startfile('db_op.pdf', command)
         except:
             pass               
        
