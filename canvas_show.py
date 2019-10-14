@@ -20,7 +20,7 @@ class Fild(ttk.Frame):
         self.step = (0, 5, 10, 15, 20)
         self.W, self.H = 988, 400       # 868, 400
         self.m_top = 35
-        self.m_right = 55
+        self.m_right = 65                # 55
         self.m_bottom = 35 
         self.m_left =  20                           # margin
         self.font = ('tahoma', '10', 'bold')        # Helvetica bold italic
@@ -122,17 +122,17 @@ class Fild(ttk.Frame):
         txtX = time.strftime("%H:%M", self.data[0].timdata)
         self.day = txtXD = time.strftime("%d.%m", self.data[0].timdata)
         if txtX and txtXD:
-            text(m_left + W - 16, m_top + H + ofsetY, text=f'{txtX}',               # text_X_time0
-                 anchor='n', font= self.font, fill='brown', tag='text')
-            text(m_left + W + 25, m_top + H + ofsetY, text=f'/{txtXD}',             # text_X_data0
-                 anchor='n', font=self.font, fill='darkgreen', tag='text')
+            text(m_left + W - 16, m_top + H + ofsetY, text=f'{txtX}/{txtXD}',               # text_X_time0
+                 anchor='n', font= self.font, fill='black', tag='text')         # brown
+            # text(m_left + W + 25, m_top + H + ofsetY, text=f'/{txtXD}',             # text_X_data0
+            #      anchor='n', font=self.font, fill='darkgreen', tag='text')
                             
 #data = [(format, glub, amp, lehth, timdata, shir, dolg, vs, kurs,...
 #         m_man, color_mm, m_avto, all_data)...] all_data = [(gl,amp,len),(gl1,amp1,len1)...]
     def set_data(self, canv):
         """Выводим данные и надписи на осях и метки"""
         W, H, m_top, m_left = self.W, self.H, self.m_top, self.m_left
-        color_p = '#f59400';color_t = 'brown';color_d = 'darkgreen';font_t = self.font
+        color_p = '#f59400';color_t = 'black';color_d = 'darkgreen';font_t = self.font
         ofsetY = 12
         # y_len = 2
         line = canv.create_line

@@ -10,6 +10,7 @@ def main():
     window = bso.App(application, 1100, 450, "БСО")
     application.protocol("WM_DELETE_WINDOW", window.exit_)
     application.minsize(900, 550)
+    # application.wm_state('zoomed')
     application.deiconify()     # show
     application.mainloop()
 

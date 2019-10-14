@@ -19,18 +19,19 @@ class Editor:
         font = ("Helvetica", 12)    # 24
         self.st = ScrolledText(master, height=12, width=40,                         # height=10
                                font=font, bg='#777', fg='yellow', wrap=tk.WORD)     # tk.NONE
-        self.st.pack(fill=tk.BOTH, expand=True)
+        # self.st.pack(fill=tk.BOTH, expand=True)
         # self.st.pack(fill=tk.Y, expand=False)
         self.st.focus()
         ttk.Separator(master).pack(fill=tk.X, expand=True)
         self.dirinfo = tk.StringVar()
         
         f = ttk.Frame(master)
-        f.pack(fill=tk.X, expand=True)
+        f.pack(side=tk.BOTTOM, fill=tk.X, expand=True)
+        self.st.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         fdir = ttk.Frame(f, padding=1, relief=tk.SUNKEN)
         fdir.pack(side=tk.LEFT, fill=tk.X, expand=True)
         ttk.Label(fdir, image=self.img_['folder'], compound=tk.LEFT, textvariable=self.dirinfo,
-                  width=55, padding=(2, 2)).pack(side=tk.LEFT, fill=tk.X, expand=True)
+                  width=9, padding=(2, 2)).pack(side=tk.LEFT, fill=tk.X, expand=True)
         ttk.Separator(f, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y)
         ttk.Sizegrip(f).pack(side=tk.RIGHT, padx=3)
         
@@ -81,7 +82,7 @@ class Editor:
         self.st.delete(1.0, tk.END)
         self.parent.ed_frame.grid_remove()
         geom = self.parent.geometry().split("+")
-        self.parent.geometry(f"751x300+{geom[1]}+{geom[-1]}")
+        self.parent.geometry(f"1051x300+{geom[1]}+{geom[-1]}")
     
     def save_(self, arg=None):
         text = self.gettext()
@@ -99,9 +100,9 @@ class ViewMetka(tk.Toplevel):
 #        set_application_icons(self, 'icons')
         self.iconbitmap(os.path.join(imgdir, 'db.ico'))
         if geom:
-            self.geometry(f"751x300+{geom[1]}+{geom[-1]}")
+            self.geometry(f"1051x300+{geom[1]}+{geom[-1]}")      # 
         else:
-            self.geometry("751x300+100+100")
+            self.geometry("1051x300+100+100")
         self.deiconify()    #
         self.bind("<Escape>", self.parent.state_db_norm)
         #self.focus_force()
@@ -109,7 +110,7 @@ class ViewMetka(tk.Toplevel):
             self.transient(parent)
         self.wait_visibility()      # подождать пока будек виден
         self.focus()
-        self.resizable(0, 1)        # не менять размер
+        self.resizable(1, 1)        # не менять размер
         #self.transient(self.parent)
         self.protocol("WM_DELETE_WINDOW", self.parent.state_db_norm)        
         
@@ -168,7 +169,7 @@ class ViewMetka(tk.Toplevel):
             self.ed.cancel_()
             return
         geom = self.geometry().split("+")
-        self.geometry(f"751x554+{geom[1]}+{geom[-1]}")
+        self.geometry(f"1051x554+{geom[1]}+{geom[-1]}")
         self.ed.st.config(state='normal')
         self.ed.st.delete(1.0, tk.END)
         self.ed.st.insert(tk.END, data)

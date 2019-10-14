@@ -17,7 +17,7 @@ class Pdf:
         # [Row(format_, glub, ampl, timdata, shir, dolg, vs, kurs, m_man, color_mm_, m_avto, all_data)...]
         self.master = master            # show_bso
         self.w, self.data, self.scr, self.scale, self.name = self.master.get_pdf_data()
-        self.W = 768.0              # слева на право
+        self.W = 756.0              # слева на право  768.0
         self.H = 450                # снизу вверх                   ## 400 !!!
         self.dx = 30                # слева
         self.dy = 90                # снизу

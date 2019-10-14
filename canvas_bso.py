@@ -110,12 +110,12 @@ class CanvasT(ttk.Frame):
         # elif glub < 1000:
         #     text = f'{glub:5.1f} м'
         else:
-            text = f'{glub_:5.1f} м'
+            text = f'{glub_:>6.1f} м'
         fill = 'orange2' if glub_ >= opgl else 'red'   # 'sienna3', 'tan1', orange2
         font = ('Arial', 42)                           # , 'bold'
         self.canv.delete('glub')
-        self.canv.create_text(130, self.canv.canvasy(self.sizeY - 40), text=text,
-                              font=font, anchor=tk.CENTER, fill=fill, tag='glub')
+        self.canv.create_text(20, self.canv.canvasy(self.sizeY - 40), text=text,           # 150
+                              font=font, anchor=tk.W, fill=fill, tag='glub')
         self.oldglub = glub_
 
     def clr_glub(self):
@@ -134,7 +134,7 @@ class CanvasT(ttk.Frame):
         """Рисуем поле"""
         lincolor = 'gray50'
         fontcolor = self.fil
-        x_right = 60       # 50
+        x_right = 75       # 60
         y_top = self.y_top
         x0 = self.sizeX - x_right
         px = 20                                                  # число пикселов между штрихами
