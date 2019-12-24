@@ -1,5 +1,16 @@
-import tkinter as tk
-application = tk.Tk()
+# import tkinter as tk
+from ttkthemes import ThemedTk
+from util import config
+
+theme = config.get('Theme', 'theme')
+
+application = ThemedTk(theme=theme)
+
+# application = ThemedTk(theme="radiance")     # plastik clearlooks elegance radiance   
+                                             # arc black blue equilux itft1 keramik kroc  
+# application.set_theme('arc')
+
+# application = tk.Tk()
 
 import bso
 

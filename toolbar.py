@@ -100,8 +100,8 @@ class Toolbar(ttk.Frame):
         btnrgb.pack(side=tk.LEFT)
         sep[i].pack(**seppk)
         i += 1
-        ttk.Label(self.f1, text="Масштаб").pack(side=tk.LEFT, padx=3)
-        btnscale = ttk.Button(self.f1, image=self.img_['h1'], style='Toolbutton',
+        # ttk.Label(self.f1, text="Масштаб").pack(side=tk.LEFT, padx=3)
+        btnscale = ttk.Button(self.f1, text='Масштаб ', image=self.img_['h1'], style='Toolbutton',
                               cursor="hand2", compound=tk.RIGHT, command=self.off_scale)
         ToolTip(btnscale, msg='Ручная шкала')
         self.b['btnscale'] = btnscale
@@ -129,17 +129,17 @@ class Toolbar(ttk.Frame):
         b_db.pack(side=tk.LEFT)
         i += 1
         sep[i].pack(**seppk)
-        ttk.Label(self.f1, text='Просмотр').pack(side=tk.LEFT, padx=3)
-        ttk.Button(self.f1, image=self.img_['visible'], style='Toolbutton',
-                   cursor="hand2", command=master.runview_mem).pack(side=tk.LEFT)
+        # ttk.Label(self.f1, text='Просмотр').pack(side=tk.LEFT, padx=3)
+        ttk.Button(self.f1, text='Просмотр ', image=self.img_['visible'], style='Toolbutton',
+                   compound=tk.RIGHT, cursor="hand2", command=master.runview_mem).pack(side=tk.LEFT)
         i += 1
         sep[i].pack(**seppk)
-        ttk.Label(self.f1, text='Конвертор').pack(side=tk.LEFT, padx=3)
-        ttk.Button(self.f1, image=self.img_['conv'], style='Toolbutton',
-                   cursor="hand2", command=master.convt).pack(side=tk.LEFT)
+        # ttk.Label(self.f1, text='Конвертор').pack(side=tk.LEFT, padx=3)
+        ttk.Button(self.f1,  text='Конвертор ', image=self.img_['conv'], style='Toolbutton',
+                   compound=tk.RIGHT, cursor="hand2", command=master.convt).pack(side=tk.LEFT)
         i += 1
         sep[i].pack(**seppk)        
-        ttk.Button(self.f1, text='Справка', image=self.img_['help'], style='Toolbutton',
+        ttk.Button(self.f1, text='Справка ', image=self.img_['help'], style='Toolbutton',
                    compound=tk.RIGHT, cursor="hand2", command=master.help).pack(side=tk.RIGHT)   # help_
         ToolTip(bmman, msg='Оперативная отметка')
         ToolTip(btnmetka, msg='Автоматические отметки')
@@ -152,7 +152,7 @@ class Toolbar(ttk.Frame):
         self.oldsec = 0
         self.tgals_min = 0
         self.tgals_hour = 0
-        self.flag_gals = False
+        # self.flag_gals = False
         # bg = 'gray35'
         # fg = 'orange'
         fg = 'black'
@@ -334,6 +334,13 @@ class Toolbar(ttk.Frame):
             self.id_rec = None
         if self.id_g:
             self.master.after_cancel(self.id_g) 
+
+    def run_loop(self):
+        """Запускаем цикл когда он завершён"""
+        if self.master.end_loop:
+            self.master.run_loop()
+        else:
+            self.master.after(5, self.run_loop)
                 
     def new_gals__(self, arg=None):
         """Смена галса"""
@@ -347,7 +354,7 @@ class Toolbar(ttk.Frame):
                 self.master.ch_state(('btnmetka', 'btnametka_on'), ('btn',))
                 self.tgals_min = 0
                 self.tgals_hour = 0
-                self.flag_gals = True                               # True цикл в run_loop Fale то break
+                # self.flag_gals = True                               # True цикл в run_loop Fale то break
                 self.master.clr_data()                              # Очистка поля
                 self.master.new_avtom__(0)                          # Остановить автометки
                 # self.master.timeravto(0)                            # Остановить автометки
@@ -357,7 +364,11 @@ class Toolbar(ttk.Frame):
                     self.master.ch_state((), ('btnmetki',))
                     if not self.master.hide_metka:
                         self.master.ch_state((), ('bmman', 'btnmetka'))
-                    self.master.run_loop()
+                    if self.master.flag_gals:
+                        self.master.flag_gals = False
+                        self.run_loop()
+                    else:
+                        self.master.run_loop()
             else:
                 self.master.ch_state(('bmman', 'btnmetka', 'btn', 'btnametka_on'), ())
 

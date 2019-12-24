@@ -128,7 +128,7 @@ class App(bso.App):
         
         if self.gser.is_open():
             self.que_gp = queue.Queue(1)
-            thread_g = threading.Thread(target=self.getmsg_g, args=(self.que_gp,))
+            thread_g = threading.Thread(target=self.getmsg_g, args=(self.que_gp,), daemon=True)
             thread_g.start()              # запуск потоковой функции нсп
 
         # self.set_local_time()                                                     ##
@@ -146,8 +146,8 @@ class App(bso.App):
     def write_rep_thread(self):
         """Посылка в репитер"""
         if self.pser.is_open():
-            self.thread_rep = threading.Thread(target=self.write_rep)
-            self.thread_rep.start()
+            thread_rep = threading.Thread(target=self.write_rep, daemon=True)
+            thread_rep.start()
 
     def gps_thread(self):
         """Чтение НСП"""
@@ -537,7 +537,8 @@ class App(bso.App):
 
     def work_(self, data):
         """data = bytes"""
-        self.parse_data(data)
+        vz = self.vz
+        self.parse_data(data, vz)
         super().work(data)
         self.board.clr_error()                 # убераем надпись Нет связи с ППУ с холста
         self.stbar.set_step(f'T = {self.delay} cек.')          # интервал опроса в статус
@@ -576,7 +577,7 @@ class App(bso.App):
             return
         self.ser.clear_port()               # очистка порта                       1
         dat = self.data_to_byte(self.send_data)
-        thread_ds = threading.Thread(target=self.ser.write, args=(dat,))
+        thread_ds = threading.Thread(target=self.ser.write, args=(dat,), daemon=True)
         thread_ds.start() 
         # self.ser.write(dat)                 # передаём в ХК info    12 bytes TODO:
         if self.sboi > 1:
@@ -584,8 +585,8 @@ class App(bso.App):
             self.board.create_error(text='Нет связи с ППУ!')     # Надпись Нет связи с ППУ на холст
         self.after(1, self.read_hach)     
 
-    def parse_data(self, data):
-        super().parse_data(data)
+    def parse_data(self, data, vz):
+        super().parse_data(data, vz)
         if self.b['btnavto'].cget('text') == 'Авто':
             self.send_data.ku = chr(data[1])
             self.send_data.depth = chr(data[0])

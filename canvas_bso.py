@@ -103,7 +103,7 @@ class CanvasT(ttk.Frame):
 
     def view_glub(self, glub_, opgl):
         """Отобразить глубину на холсте"""
-        if self.bso_ and (not self.root.tol_bar.flag_gals or self.error_pui):   # !!
+        if self.bso_ and (not self.root.flag_gals or self.error_pui):   # !!
             return
         if glub_ <= 0:                        # if not glub:
             text = '-' * 5        # '-'*6

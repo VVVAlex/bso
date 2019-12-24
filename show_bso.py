@@ -42,6 +42,7 @@ class App(ttk.Frame):
         parent.focus_force()
         frame = ttk.Frame(parent, padding=0)
         frame.pack(fill='both', expand='yes')
+        # frame.pack(fill='x', expand='no')
         # self.rev_flag = False                            # True реверс включен
         self.frame = frame
         self.tbname = self.dbname = None
@@ -497,10 +498,10 @@ class Toolbar(ttk.Frame):
         super().__init__(master)
         self.master = master
         self.btn = {}
-        self.toolbar = ttk.Frame(master.frame, padding=1)
+        self.toolbar = ttk.Frame(master.frame, padding='0')
         ttk.Separator(master.frame).pack(fill="x", expand="no")
-        bar_left = ttk.Frame(self.toolbar, padding=0)
-        self.bar_right = ttk.Frame(self.toolbar, padding=0)
+        bar_left = ttk.Frame(self.toolbar, padding='0')
+        self.bar_right = ttk.Frame(self.toolbar, padding='0')
         j = 0
         padding = (2, 2)
         img_ = master.img_
@@ -518,13 +519,13 @@ class Toolbar(ttk.Frame):
                     ttk.Separator(bar_left, orien="vertical").grid(row=0, column=j,
                                                                    sticky="ns", padx=2, pady=2)
                 else:
-                    bt = ttk.Button(bar_left, style="Toolbutton", image=image_, compound="left",
-                                    cursor="hand2", padding=padding,        # TLabel TButton
+                    bt = ttk.Button(bar_left, style="TLabel", image=image_, compound="left",
+                                    cursor="hand2", padding=padding,        # TLabel TButton Toolbutton
                                     width=0, command=command)
                     bt.grid(row=0, column=j, padx=0)
                     self.btn[tip] = bt
                     ToolTip(self.btn[tip], msg=tip)
-            except tk.TclError:
+            except tk.TclError as err:
                 # print(f"e > {err}")
                 pass
         self.btn['Печать'].config(state='disabled')
@@ -554,7 +555,7 @@ class Toolbar(ttk.Frame):
                     ttk.Separator(self.bar_right, orient="vertical").grid(row=0, column=j,
                                                                           sticky="ns", padx=2, pady=2)
                 else:
-                    bt2 = ttk.Button(self.bar_right, style="Toolbutton", image=image,
+                    bt2 = ttk.Button(self.bar_right, style="TLabel", image=image,     # Toolbutton
                                      compound="left", cursor="hand2", padding=padding,
                                      width=0, command=command)        # space=1,
                     bt2.grid(row=0, column=j)

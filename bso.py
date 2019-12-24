@@ -8,8 +8,9 @@ __email__ = 'lexa1st@mail.ru'
 import tkinter as tk
 import tkinter.messagebox as box
 from tkinter import ttk
+from ttkthemes import ThemedTk      ##
 from tkinter.filedialog import askdirectory
-import os, time
+import os, time, sys
 import pathlib
 import threading
 import queue
@@ -129,6 +130,8 @@ class App(ttk.Frame):
         self.color_ch = True
         self.t_pausa = 0
         self.y_metka = self.board.y_top
+        self.flag_gals = False
+        self.vzvuk = 1500
         if bso_:
             self.gui_main()
             self.sep.pack_forget()
@@ -195,6 +198,7 @@ class App(ttk.Frame):
             
     def runview_mem(self, arg=None):
         """Запуск просмотра Viewer"""
+        # from ttkthemes import ThemedStyle
         # bakfile = None
         # if self.file_gals:
         #     fd, bakfile = tempfile.mkstemp()    # bakdir = tempfile.mkdtemp()  shutil.rmtree(bakdir)
@@ -203,10 +207,14 @@ class App(ttk.Frame):
         #         os.close(fd)
         #     except IOError:
         #         bakfile = None
+        # self.root.set_theme('arc')
         top = tk.Toplevel()
+        # top = ThemedTk(theme='arc', toplevel=True)
         title = 'БСО просмотр логов' if bso_ else 'ПУИ просмотр логов'
         # app_view = show_bso.App(top, title=title, filename=bakfile, galsname=self.file_gals)
         app_view = show_bso.App(top, title=title, galsname=self.file_gals)
+        # style = ThemedStyle(top)
+        # style.set_theme("arc")
         app_view.run()
         top.protocol("WM_DELETE_WINDOW", app_view.file_quit)
         top.iconbitmap(self.path.joinpath(imgdir, 'bookmark.ico'))
@@ -322,7 +330,7 @@ class App(ttk.Frame):
     @decorate_metka('', 'mman_td')
     def opmanual(self, arg=None):
         """Обработчик кнопки постановки ручной метки"""
-        if not self.tol_bar.flag_gals and bso_:
+        if not self.flag_gals and bso_:
             return                      # если галс не выбран то не ставим отметку
         color, tag = ("spring green", 'mman_td') if arg else ("red", 'mman_t')
         x = self.board.x0 - 3
@@ -385,7 +393,7 @@ class App(ttk.Frame):
             self.board.move_metkai_hide(hide=False)
             image = self.img_['geoon']
             ToolTip(self.b['btnmetki'], msg='Метки видны')
-            if self.tol_bar.flag_gals:
+            if self.flag_gals:
                 self.ch_state((), ('bmman', 'btnmetka'))
         else:
             self.board.move_metkai_hide(hide=True)
@@ -517,7 +525,7 @@ class App(ttk.Frame):
         # self.ch_state(('btn', 'b_db'), ())            #
         self.ch_state(('btn',), ())
         self.tol_bar.num_gals.set(f"{' ':^19}")
-        self.tol_bar.flag_gals = False
+        self.flag_gals = False
         self.b['bgals'].config(state='normal')          
                 
     def vzonav_(self):
@@ -582,6 +590,7 @@ class App(ttk.Frame):
             ampl = data[6]          # цвет
             # lenth = data[7]         # длительность импульса
             lenth = self.cal_len(data[7])
+            # print(f'> {glub} - {data[7]}')
             # lenth = self.cal_len(data[7], self.d0[depth])
             # print(data[7], lenth)
             m_avto =  m_man = color_mm = ''   # авто метка, ручн.метка, цвет ручной метки
@@ -622,6 +631,8 @@ class App(ttk.Frame):
                     st_d.append(gd)
                     st_d.append(ad)
                     st_d.append(ld)
+                    print(f'{gd} - {data[i + 3]}, ', end='')
+                    print()
                 file_list.extend(st_d)
             with open(self.file_gals, 'a', newline='') as f:
                 f_csv = csv.writer(f)
@@ -770,7 +781,7 @@ class App(ttk.Frame):
             self.infobar.rej_var.set(f"{rej}")
             frek = '25 кГц' if data[0] == 0x25 else '50 кГц'   # частота
             self.frek_var.set(f"{frek}")
-            self.parse_data(data[15 : -2])
+            self.parse_data(data[15 : -2], vz)
 
         if self.data_point[0] > 0:
             # self.y_metka = self.board.y_top + self.data_point[0] * self.board.px / self.board.k + 1
@@ -785,14 +796,14 @@ class App(ttk.Frame):
 
     def getmsg(self, que):
         """Поточная функция чтения ППУ"""
-        while self.tol_bar.flag_gals:
+        while self.flag_gals:
             msg = self.ser.read_allb()         # byte or None
             if msg:
                 que.put(msg)                   # ждём пока очередь будет пуста
 
-    def getmsg_g(self, que_gp):
+    def getmsg_gp(self, que_gp):
         """Поточная функция чтения НСП"""
-        while self.tol_bar.flag_gals:
+        while self.flag_gals:
             msg = self.gser.get_msg()          # str or None
             if msg:
                 que_gp.put(msg)                # ждём пока очередь будет пуста
@@ -812,19 +823,19 @@ class App(ttk.Frame):
             return
         self.ser.clear_port()                   # очистка порта
         que = queue.Queue(1)
+        self.flag_gals = True
         if self.gser.is_open():
             que_g = queue.Queue(1)
-            thread_g = threading.Thread(target=self.getmsg_g, args=(que_g,))       # daemon=True
+            thread_g = threading.Thread(target=self.getmsg_gp, args=(que_g,), daemon=True)  # daemon=True
             thread_g.start()
-        thread_d = threading.Thread(target=self.getmsg, args=(que,))
+        thread_d = threading.Thread(target=self.getmsg, args=(que,), daemon=True)
         thread_d.start()
+        self.end_loop = False
         self.timer = True
         self.local = False
-        # self.timer_g = True
+        self.timer_g = True
         self.not_data_g()
-        while 1:
-            if not self.tol_bar.flag_gals:      # exit loop
-                break
+        while self.flag_gals:
             if self.gser.is_open():
                 try:
                     data_g = que_g.get_nowait()
@@ -866,13 +877,17 @@ class App(ttk.Frame):
                 self.blink()
                 self.root.update()
                 self.ida_ = True
-        if self.gser.is_open():
-            thread_g.join()         #
-        thread_d.join()             #
+        try:
+            t.cancel()
+            tg.cancel()
+        except:
+            pass
+        self.flag_gals = False
+        self.end_loop = True
 
     def not_data(self):
         """Вызов при отсутствии данных в линии"""
-        self.timer = True
+        # self.timer = True
         self.stbar.set_icon(self.img_['networkx'])
         self.board.create_error()        # Выводим на холст Нет данных
         self.ch_state(('bmman', 'btnmetka', 'btnametka_on'), ())
@@ -881,16 +896,17 @@ class App(ttk.Frame):
     def not_data_g(self):
         """Вызов при отсутствии данных в линии GPS"""
         # s = ttk.Style()
-        self.timer_g = True
+        # self.timer_g = True
         self.local = False
         # s.configure('H.TLabel', foreground='#2754aa')   # синий
         self.set_local_time()
 
-    def parse_data(self, data):
+    def parse_data(self, data, vz):
         """
         Разбор данных глубин и амплитуд
         (b'depth,ku,m,cnt,gl_0h,gl_0l,am_0h,am_0l,glh,gll,amh,aml,...glh,gll,amh,aml')
         """
+        self.vzvuk = vz
         # data_point = []
         # data_ampl = []                                    # 1+cnt глубин и 1+cnt (амплитуд, длительностей)
         # data_len = []
@@ -921,6 +937,7 @@ class App(ttk.Frame):
             # ampl = data[6] if self.mb else data[7]  amplful = int.from_bytes(data[6:8], 'big')
             ampl = data[6] 
             lenth = data[7]
+            # print(lenth)
             bg = self.board.rgbc(ampl * 7)  if ampl else 'gray85'        ## ~
             self.infobar.lab_a_l.config(background=bg)
             # lenth = self.cal_len(data[7], depth)
@@ -957,15 +974,24 @@ class App(ttk.Frame):
         self.data_len = data_len
 
     def cal_len(self, cod):
-        cod = cod * 1.5 / 100
-        # print(depth, type(depth))
-        if self.depth == 'МГ': n = 4
-        elif self.depth == 'СГ': n = 32
-        elif self.depth == 'БГ': n = 256
-        elif self.depth == 'Б6': n = 256     # !
+        if self.depth == 'МГ': n = 0.4
+        elif self.depth == 'СГ': n = 1.6
+        elif self.depth == 'БГ': n = 12.8
+        elif self.depth == 'Б6': n = 12.8     # !
         else:
             n = 0    
-        return cod * n
+        return round(cod * n * self.vzvuk / 10000, 2)
+
+    # def cal_len(self, cod):
+    #     cod = cod * 1.5 / 100
+    #     # print(depth, type(depth))
+    #     if self.depth == 'МГ': n = 4
+    #     elif self.depth == 'СГ': n = 32
+    #     elif self.depth == 'БГ': n = 256
+    #     elif self.depth == 'Б6': n = 256     # !
+    #     else:
+    #         n = 0    
+    #     return cod * n
 
 #========================================================
 
@@ -988,13 +1014,17 @@ class App(ttk.Frame):
             self.ser.close_port()
         if self.gser.is_open():
             self.gser.close_port()
-        main_thread = threading.main_thread()
-        for t in threading.enumerate():
-            if t is main_thread:
-                continue
-            t.join()
+        if not bso_:
+            if self.pser.is_open():
+                self.pser.close_port()
+        # main_thread = threading.main_thread()
+        # for t in threading.enumerate():
+        #     if t is main_thread:
+        #         continue
+        #     t.join(timeout=2.0)
         try:
             self.root.destroy()
+            sys.exit(0)
         except Exception:
             pass
 
@@ -1004,7 +1034,7 @@ class App(ttk.Frame):
             # sys.stderr = open('err.log', 'a')   #
             self.root.withdraw()
             self.tol_bar.t = 0
-            self.tol_bar.flag_gals = False
+            self.flag_gals = False
             shutil.rmtree(bakdir)               # удаляем tmp каталог
             self.after(500, self.quitter)
 
